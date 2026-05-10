@@ -1,0 +1,423 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mic 的呼吸區段考互動題庫 v7</title>
+<style>
+:root{
+  --bg:#f7f8fb; --card:#ffffff; --ink:#172033; --muted:#667085; --line:#d8dee9;
+  --accent:#2563eb; --accentText:#ffffff; --good:#059669; --bad:#dc2626; --unknown:#b45309;
+  --radius:16px; --fontSize:16px; --cardMax:920px; --bgImage:none; --bgOpacity:.18; --bgBlur:0px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:rgba(37,99,235,.15)}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Noto Sans TC","Microsoft JhengHei",Arial,sans-serif;background:var(--bg);color:var(--ink);font-size:var(--fontSize)}
+body:before{content:"";position:fixed;inset:0;background-image:var(--bgImage);background-size:cover;background-position:center;opacity:var(--bgOpacity);filter:blur(var(--bgBlur));z-index:-1}
+button,input,select,textarea{font:inherit}
+button{touch-action:manipulation}
+header{background:color-mix(in srgb,var(--card) 90%,transparent);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
+.hero{max-width:1220px;margin:auto;padding:14px 12px;display:flex;gap:12px;align-items:center}
+.avatar{width:54px;height:54px;border-radius:50%;object-fit:cover;background:var(--line);border:2px solid var(--card);display:none}
+.heroText{flex:1;min-width:0}
+h1{font-size:22px;margin:0 0 3px}
+.subtitle{color:var(--muted);font-size:14px}
+.heroImg{height:72px;max-width:260px;border-radius:var(--radius);object-fit:cover;display:none}
+.topControls{max-width:1220px;margin:auto;padding:0 12px 12px;display:grid;grid-template-columns:1fr 150px 150px 150px 125px;gap:8px}
+input,select,textarea{padding:10px;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);min-width:0}
+.layout{max-width:1220px;margin:14px auto;padding:0 12px;display:grid;grid-template-columns:310px 1fr;gap:14px}
+.panel,.card{background:color-mix(in srgb,var(--card) 96%,transparent);border:1px solid var(--line);border-radius:var(--radius);box-shadow:0 1px 2px rgba(16,24,40,.04)}
+.panel{padding:12px;margin-bottom:12px}
+.card{padding:16px;margin:0 auto 12px;max-width:var(--cardMax)}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.stat{background:color-mix(in srgb,var(--accent) 7%,var(--card));border-radius:12px;text-align:center;padding:8px;border:1px solid color-mix(in srgb,var(--accent) 15%,var(--line))}
+.stat b{font-size:20px;display:block}
+.small{font-size:13px;color:var(--muted)}
+.btn{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:12px;padding:9px 10px;margin:3px;cursor:pointer}
+.btn.primary{background:var(--accent);color:var(--accentText);border-color:var(--accent)}
+.btn:active,.choice:active{transform:scale(.99)}
+.badge{font-size:12px;border:1px solid var(--line);border-radius:999px;padding:4px 8px;background:color-mix(in srgb,var(--accent) 5%,var(--card));display:inline-flex;align-items:center;gap:4px}
+.meta{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.stem{white-space:pre-wrap;line-height:1.58;font-weight:650;font-size:1.03em;margin:10px 0}
+.qimg{max-width:100%;border:1px solid var(--line);border-radius:12px;margin:8px 0;background:white}
+.choices{display:grid;gap:8px;margin-top:10px}
+.choice{width:100%;text-align:left;border:1px solid var(--line);border-radius:13px;background:var(--card);color:var(--ink);padding:12px;cursor:pointer;line-height:1.45}
+.choice:hover{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 6%,var(--card))}
+.choice.correct{border-color:var(--good);background:color-mix(in srgb,var(--good) 11%,var(--card))}
+.choice.wrong{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 10%,var(--card))}
+.choice.unknown{border-color:var(--unknown);background:color-mix(in srgb,var(--unknown) 10%,var(--card))}
+.result{display:none;margin-top:12px;border-radius:13px;padding:12px;line-height:1.58}
+.result.good{display:block;background:color-mix(in srgb,var(--good) 12%,var(--card));border:1px solid color-mix(in srgb,var(--good) 55%,var(--line))}
+.result.bad{display:block;background:color-mix(in srgb,var(--bad) 10%,var(--card));border:1px solid color-mix(in srgb,var(--bad) 45%,var(--line))}
+.result.unknown{display:block;background:color-mix(in srgb,var(--unknown) 12%,var(--card));border:1px solid color-mix(in srgb,var(--unknown) 45%,var(--line))}
+.explain{border-top:1px dashed rgba(0,0,0,.18);margin-top:9px;padding-top:9px;white-space:pre-wrap}
+.tools{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;align-items:center}
+.note{width:100%;min-height:70px;margin-top:8px;display:none}
+.note.show{display:block}
+.settings{display:none}.settings.show{display:block}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.progressBar{height:10px;background:color-mix(in srgb,var(--line) 70%,transparent);border-radius:999px;overflow:hidden}.progressBar>span{display:block;height:100%;background:var(--accent);width:0%}
+.warn{background:#fff7ed;border:1px solid #fed7aa;border-radius:12px;padding:10px;margin:8px 0;color:#7c2d12}
+.pager{text-align:center;margin:16px 0}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:10;padding:15px}
+.modal.show{display:flex}.modalBox{max-width:880px;max-height:88vh;overflow:auto;background:var(--card);border-radius:18px;padding:16px;border:1px solid var(--line)}
+.compact .card{padding:11px}.compact .choice{padding:9px}.dark{color-scheme:dark}.retryActive .card{outline:2px solid color-mix(in srgb,var(--accent) 35%,transparent);outline-offset:2px}
+@media(max-width:900px){header{position:static}.layout{grid-template-columns:1fr}.topControls{grid-template-columns:1fr}.heroImg{display:none!important}.grid2,.grid3{grid-template-columns:1fr}.card{max-width:100%}}
+</style>
+</head>
+<body>
+<header>
+  <div class="hero">
+    <img id="avatar" class="avatar" alt="">
+    <div class="heroText">
+      <h1 id="siteTitle">Mic 的呼吸區段考互動題庫</h1>
+      <div class="subtitle"><span id="siteSubtitle">考前練題、錯題追蹤、詳解複習</span>｜<span id="countdown">尚未設定考試日</span></div>
+    </div>
+    <img id="heroImage" class="heroImg" alt="">
+  </div>
+  <div class="topControls">
+    <input id="search" placeholder="搜尋：喉返神經、surfactant、V/Q...">
+    <select id="source"><option value="">全部來源</option></select>
+    <select id="course"><option value="">全部上課內容</option></select>
+    <select id="topic"><option value="">全部主題</option></select>
+    <button class="btn primary" id="openSettings">個人化設定</button>
+  </div>
+</header>
+
+<div class="layout">
+<aside>
+<div class="panel">
+  <b>今日目標</b>
+  <div class="small"><span id="goalText">目標 80 題</span></div>
+  <div class="progressBar"><span id="goalBar"></span></div>
+</div>
+<div class="panel stats">
+  <div class="stat"><b id="s_total">0</b><span class="small">目前題數</span></div>
+  <div class="stat"><b id="s_done">0</b><span class="small">已作答</span></div>
+  <div class="stat"><b id="s_right">0</b><span class="small">答對</span></div>
+  <div class="stat"><b id="s_wrong">0</b><span class="small">答錯</span></div>
+  <div class="stat"><b id="s_unknown">0</b><span class="small">不知道</span></div>
+  <div class="stat"><b id="s_rate">0%</b><span class="small">正確率</span></div>
+</div>
+<div class="panel">
+  <button class="btn" data-mode="all">全部題</button>
+  <button class="btn" data-mode="wrong">錯題</button>
+  <button class="btn" data-mode="unknown">不知道</button>
+  <button class="btn" data-mode="unmastered">未掌握</button>
+  <button class="btn" data-mode="unseen">未作答</button>
+  <button class="btn" data-mode="flagged">必背／考前再看</button>
+  <button class="btn" data-mode="red">紅色警戒</button>
+  <button class="btn" data-mode="explain">詳解模式</button>
+  <button class="btn" data-mode="last30">最後30分鐘</button>
+  <button class="btn" id="shuffle">隨機排序</button>
+</div>
+<div class="panel">
+  <b>重練模式</b>
+  <div class="small" style="margin:6px 0">先用來源／上課內容／主題／錯題等篩選，再按重練；答案會先全部遮住。</div>
+  <button class="btn primary" id="startRetry">重練目前篩選題目</button>
+  <button class="btn" id="endRetry">結束重練／回複習</button>
+  <div id="retryStats" class="small" style="margin-top:8px">尚未開始重練</div>
+</div>
+<div class="panel">
+  <b>模擬考</b>
+  <div class="grid2" style="margin-top:8px">
+    <input id="mockCount" type="number" min="5" value="40">
+    <button class="btn primary" id="startMock">開始抽題</button>
+  </div>
+  <button class="btn" id="submitMock" style="display:none">交卷看詳解</button>
+  <div id="timer" class="small"></div>
+</div>
+<div class="panel">
+  <b>匯出</b><br>
+  <button class="btn" id="exportWeak">匯出未掌握小抄</button>
+  <button class="btn" id="exportSettings">匯出設定</button>
+  <label class="btn">匯入設定<input id="importSettings" type="file" accept=".json" style="display:none"></label>
+</div>
+<div class="panel">
+  <b>弱點主題</b>
+  <div id="weakTopics" class="small"></div>
+</div>
+<div class="panel">
+  <button class="btn" id="reset">清除作答紀錄</button>
+</div>
+</aside>
+
+<main>
+  <div id="status" class="small"></div>
+  <div id="warnings"></div>
+  <div id="list"></div>
+  <div class="pager">
+    <button class="btn" id="prev">上一頁</button>
+    <span id="pageInfo" class="small"></span>
+    <button class="btn" id="next">下一頁</button>
+  </div>
+</main>
+</div>
+
+<div class="modal" id="settingsModal">
+  <div class="modalBox">
+    <h2 style="margin-top:0">個人化設定</h2>
+    <div class="grid2">
+      <label>網站標題<input id="set_title"></label>
+      <label>副標<input id="set_subtitle"></label>
+      <label>考試日期<input id="set_exam" type="date"></label>
+      <label>今日目標題數<input id="set_goal" type="number" min="1"></label>
+      <label>預設主題<select id="set_preset"><option value="">自訂</option><option value="light">清爽白</option><option value="dark">深色夜讀</option><option value="cream">奶白綠</option><option value="pink">粉色</option><option value="mono">極簡黑白</option></select></label>
+      <label>版面<select id="set_density"><option value="comfortable">舒適</option><option value="compact">緊湊</option></select></label>
+    </div>
+    <h3>顏色</h3>
+    <div class="grid3">
+      <label>主色<input id="set_accent" type="color"></label>
+      <label>背景<input id="set_bg" type="color"></label>
+      <label>卡片<input id="set_card" type="color"></label>
+      <label>文字<input id="set_ink" type="color"></label>
+      <label>答對<input id="set_good" type="color"></label>
+      <label>答錯<input id="set_bad" type="color"></label>
+    </div>
+    <h3>圖片</h3>
+    <div class="grid2">
+      <label>頭像網址<input id="set_avatar_url" placeholder="可貼圖片網址"></label>
+      <label>橫幅網址<input id="set_hero_url" placeholder="可貼圖片網址"></label>
+      <label>背景網址<input id="set_bg_url" placeholder="可貼圖片網址"></label>
+      <label>背景透明度<input id="set_bg_opacity" type="range" min="0" max="0.7" step="0.01"></label>
+      <label class="btn">上傳頭像<input id="upload_avatar" type="file" accept="image/*" style="display:none"></label>
+      <label class="btn">上傳橫幅<input id="upload_hero" type="file" accept="image/*" style="display:none"></label>
+      <label class="btn">上傳背景<input id="upload_bg" type="file" accept="image/*" style="display:none"></label>
+    </div>
+    <h3>字體與卡片</h3>
+    <div class="grid2">
+      <label>字體大小<input id="set_font" type="range" min="14" max="22" step="1"></label>
+      <label>卡片寬度<input id="set_width" type="range" min="680" max="1120" step="20"></label>
+    </div>
+    <div class="tools">
+      <button class="btn primary" id="saveSettings">儲存設定</button>
+      <button class="btn" id="closeSettings">關閉</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+"use strict";
+const DATA_URL="quiz_data_v7.json";
+const REC_KEY="respQuizSite.v2.records";
+const SET_KEY="respQuizV5Settings";
+let DATA={questions:[],warnings:[]}, QS=[], current=[], page=1, pageSize=10, mode="all", shuffled=false;
+let mock=null, mockStart=0, timerInt=null;
+let retry=null;
+const $=id=>document.getElementById(id);
+const esc=s=>(s??"").toString().replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m]));
+const norm=s=>(s??"").toString().toLowerCase();
+function load(k,def){try{return JSON.parse(localStorage.getItem(k)||JSON.stringify(def))}catch(e){return def}}
+function save(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+let records=load(REC_KEY,{});
+let settings=load(SET_KEY,{title:"Mic 的呼吸區段考互動題庫",subtitle:"考前練題、錯題追蹤、詳解複習",goal:80,accent:"#2563eb",bg:"#f7f8fb",card:"#ffffff",ink:"#172033",good:"#059669",bad:"#dc2626",unknown:"#b45309",font:16,width:920,bgOpacity:.18,density:"comfortable"});
+async function init(){
+  try{const res=await fetch(DATA_URL,{cache:"no-store"}); if(!res.ok) throw new Error(res.status); DATA=await res.json(); QS=(DATA.questions||[]).map((q,i)=>{q._i=i;return q});}
+  catch(e){$("list").innerHTML='<div class="warn"><b>讀不到 quiz_data_v5.json。</b><br>請確認 GitHub repo 根目錄有 index.html 和 quiz_data_v5.json。錯誤：'+esc(e.message)+'</div>';return}
+  fillFilters(); bind(); applySettings(); render();
+}
+function fillFilters(){
+  [...new Set(QS.map(q=>q.source).filter(Boolean))].sort().forEach(v=>{let o=new Option(v,v);$("source").add(o)});
+  ["解剖學1️⃣","解剖學2️⃣","組織學","生理學1️⃣","生理學2️⃣","生理學3️⃣","病理學1️⃣","病理學2️⃣","胚胎學","臨床醫學","待確認"].forEach(v=>{let o=new Option(v,v);$("course").add(o)});
+  [...new Set(QS.map(q=>q.topic).filter(Boolean))].sort().forEach(v=>{let o=new Option(v,v);$("topic").add(o)});
+  $("warnings").innerHTML=(DATA.warnings||[]).map(w=>'<div class="warn">'+esc(w)+'</div>').join("")
+}
+function bind(){
+  ["search","source","course","topic"].forEach(id=>$(id).addEventListener("input",()=>{page=1;render()}));
+  document.querySelectorAll("[data-mode]").forEach(b=>b.onclick=()=>{mode=b.dataset.mode;page=1;mock=null;render()});
+  $("shuffle").onclick=()=>{shuffled=true;page=1;render()};
+  $("startRetry").onclick=startRetry;
+  $("endRetry").onclick=endRetry;
+  $("prev").onclick=()=>{if(page>1){page--;render();scrollTo(0,0)}};
+  $("next").onclick=()=>{let pages=Math.max(1,Math.ceil(current.length/pageSize)); if(page<pages){page++;render();scrollTo(0,0)}};
+  $("reset").onclick=()=>{if(confirm("確定清除全部作答紀錄、筆記與標籤？")){records={};save(REC_KEY,records);render()}};
+  $("openSettings").onclick=()=>openSettings();
+  $("closeSettings").onclick=()=>$("settingsModal").classList.remove("show");
+  $("saveSettings").onclick=()=>saveSettingsFromForm();
+  $("set_preset").onchange=e=>applyPreset(e.target.value);
+  ["upload_avatar","upload_hero","upload_bg"].forEach(id=>$(id).onchange=e=>readImage(e.target.files[0],id));
+  $("exportSettings").onclick=exportSettings;
+  $("importSettings").onchange=importSettings;
+  $("exportWeak").onclick=exportWeak;
+  $("startMock").onclick=startMock;
+  $("submitMock").onclick=submitMock;
+  document.addEventListener("click",e=>{
+    let b=e.target.closest("button[data-act]"); if(!b)return;
+    let q=QS[Number(b.dataset.i)]; if(!q)return;
+    if(b.dataset.act==="answer") answer(q,b.dataset.k);
+    if(b.dataset.act==="unknown") unknown(q);
+    if(b.dataset.act==="toggleNote") toggleNote(q);
+    if(b.dataset.act==="flag") setFlag(q,b.dataset.val);
+    if(b.dataset.act==="conf") setConfidence(q,b.dataset.val);
+    if(b.dataset.act==="mistake") setMistake(q,b.dataset.val);
+    if(b.dataset.act==="sameTopic"){ $("topic").value=q.topic||""; mode="all"; page=1; render(); scrollTo(0,0); }
+  });
+  document.addEventListener("input",e=>{
+    let t=e.target.closest("textarea[data-note]"); if(t){let q=QS[Number(t.dataset.note)]; let r=rec(q); r.note=t.value; putRec(q,r);}
+  });
+}
+function rec(q){return records[q.id]||{}}
+function putRec(q,r){records[q.id]=r;save(REC_KEY,records);stats()}
+function filtered(ignoreRetry=false){
+  if(retry&&retry.active&&!ignoreRetry){
+    return retry.ids.map(id=>QS.find(q=>q.id===id)).filter(Boolean);
+  }
+  const s=$("source").value,c=$("course").value,t=$("topic").value,q=norm($("search").value);
+  let arr=QS.filter(x=>{
+    const r=rec(x); const seen=!!(r.seen||r.choice);
+    const unmastered=r.wrong||r.unknown||["有點卡","考前再看","必背"].includes(r.flag)||["猜的","完全不會"].includes(r.confidence);
+    if(s&&x.source!==s)return false; if(c&&!(x.course_tags||[]).includes(c))return false; if(t&&x.topic!==t)return false;
+    if(q&&!norm([x.stem,x.source,x.topic,...(x.choices||[]).map(c=>c.text)].join(" ")).includes(q))return false;
+    if(mode==="wrong"&&!r.wrong)return false;
+    if(mode==="unknown"&&!r.unknown)return false;
+    if(mode==="unmastered"&&!unmastered)return false;
+    if(mode==="unseen"&&seen)return false;
+    if(mode==="flagged"&&!["考前再看","必背"].includes(r.flag))return false;
+    if(mode==="red"&&((r.wrongCount||0)<3))return false;
+    if(mode==="last30"&&!(r.wrong||r.unknown||["必背","考前再看"].includes(r.flag)||(r.wrongCount||0)>=2))return false;
+    return true;
+  });
+  if(mock) arr=mock.questions;
+  if(mode==="explain") arr=arr.filter(x=>{const r=rec(x); return r.seen||r.choice||r.flag||r.note||r.wrong||r.unknown});
+  if(shuffled){arr=[...arr].sort(()=>Math.random()-.5);shuffled=false}
+  return arr;
+}
+function stats(){
+  let done=0,right=0,wrong=0,unk=0,weakTopics={},unmaster=0,todayDone=0;
+  const today=new Date().toDateString();
+  QS.forEach(q=>{const r=rec(q); if(!(r.seen||r.choice))return; done++; if(r.correct)right++; if(r.wrong){wrong++;weakTopics[q.topic]=(weakTopics[q.topic]||0)+1} if(r.unknown){unk++;weakTopics[q.topic]=(weakTopics[q.topic]||0)+1}
+    const u=r.wrong||r.unknown||["有點卡","考前再看","必背"].includes(r.flag)||["猜的","完全不會"].includes(r.confidence); if(u)unmaster++;
+    if(r.day===today)todayDone++;
+  });
+  $("s_total").textContent=current.length;$("s_done").textContent=done;$("s_right").textContent=right;$("s_wrong").textContent=wrong;$("s_unknown").textContent=unk;$("s_rate").textContent=(right+wrong)?Math.round(right/(right+wrong)*100)+"%":"0%";
+  const goal=Number(settings.goal||80); $("goalText").textContent=`今日目標 ${goal} 題｜已完成 ${todayDone} 題｜未掌握 ${unmaster} 題`; $("goalBar").style.width=Math.min(100,Math.round(todayDone/goal*100))+"%";
+  $("weakTopics").innerHTML=Object.entries(weakTopics).sort((a,b)=>b[1]-a[1]).slice(0,8).map(([k,v],i)=>`${i+1}. ${esc(k||"其他")}：${v}`).join("<br>")||"目前還沒有弱點統計";
+}
+function optionText(q,k){return ((q.choices||[]).find(c=>c.key===k)||{}).text||""}
+function card(q){
+  const r=rec(q), img=q.image?`<img class="qimg" loading="lazy" src="${q.image}" alt="題目圖片">`:"";
+  const choices=(q.choices||[]).map(c=>`<button class="choice" data-act="answer" data-i="${q._i}" data-k="${esc(c.key)}"><b>${esc(c.key)}.</b> ${esc(c.text)}</button>`).join("");
+  const noteClass=r.showNote||r.note?"show":"";
+  return `<section class="card" id="card_${q._i}">
+  <div class="meta"><span class="badge">${esc(q.source)}</span><span class="badge">第 ${esc(q.number)} 題</span><span class="badge">${esc(q.topic||"其他")}</span>${(q.course_tags||[]).map(v=>`<span class="badge" style="border-color:var(--accent);color:var(--accent)">上課內容：${esc(v)}</span>`).join("")}${(r.wrongCount||0)>=3?'<span class="badge" style="color:var(--bad)">紅色警戒</span>':""}</div>
+  <div class="stem">${esc(q.stem)}</div>${img}
+  <div class="choices">${choices}<button class="choice unknown" data-act="unknown" data-i="${q._i}"><b>不知道</b>，直接看答案</button></div>
+  <div class="result" id="res_${q._i}"></div>
+  <div class="tools">
+    <button class="btn" data-act="toggleNote" data-i="${q._i}">我的筆記</button>
+    ${["太簡單","有點卡","考前再看","必背"].map(v=>`<button class="btn ${r.flag===v?"primary":""}" data-act="flag" data-val="${v}" data-i="${q._i}">${v}</button>`).join("")}
+    ${["很穩","普通","猜的","完全不會"].map(v=>`<button class="btn ${r.confidence===v?"primary":""}" data-act="conf" data-val="${v}" data-i="${q._i}">${v}</button>`).join("")}
+    ${["粗心錯","觀念不會","選項混淆","題目看錯","需要背"].map(v=>`<button class="btn ${r.mistake===v?"primary":""}" data-act="mistake" data-val="${v}" data-i="${q._i}">${v}</button>`).join("")}
+    <button class="btn" data-act="sameTopic" data-i="${q._i}">同考點連續練</button>
+  </div>
+  <textarea class="note ${noteClass}" data-note="${q._i}" placeholder="我的筆記：這題我容易搞混的是...">${esc(r.note||"")}</textarea>
+  </section>`;
+}
+function render(){
+  current=filtered(); stats(); updateRetryStats(); document.body.classList.toggle("retryActive",!!(retry&&retry.active));
+  const pages=Math.max(1,Math.ceil(current.length/pageSize)); if(page>pages)page=pages;
+  const part=current.slice((page-1)*pageSize,page*pageSize);
+  $("status").textContent="模式："+(retry&&retry.active?"重練模式":(mock?"模擬考":({all:"全部題",wrong:"只練錯題",unknown:"只練不知道",unseen:"只練未作答",unmastered:"未掌握",flagged:"必背／考前再看",red:"紅色警戒",explain:"詳解模式",last30:"最後30分鐘"}[mode]||mode)))+"｜顯示 "+current.length+" 題"+(retry&&retry.active?"｜答案已遮蔽，重新作答後才顯示":"");
+  $("pageInfo").textContent=`第 ${page} / ${pages} 頁`;
+  $("list").innerHTML=part.map(card).join("");
+  part.forEach(applyRecord);
+}
+function answer(q,k){
+  const ok=(q.answer&&k===q.answer), r=rec(q);
+  if(retry&&retry.active){
+    retry.answers[q.id]={choice:k,correct:ok,wrong:!ok,unknown:false,ts:Date.now()};
+    r.retryTotal=(r.retryTotal||0)+1;
+    r.retryCorrect=(r.retryCorrect||0)+(ok?1:0);
+    r.retryWrong=(r.retryWrong||0)+(ok?0:1);
+    r.retryUnknown=r.retryUnknown||0;
+    r.lastRetry=Date.now();
+    if(!ok)r.wrongCount=(r.wrongCount||0)+1;
+    putRec(q,r); applyRecord(q); updateRetryStats(); return;
+  }
+  if(mock && !mock.submitted){r.mockChoice=k; r.seen=true; putRec(q,r); applyRecord(q); return}
+  Object.assign(r,{choice:k,correct:ok,wrong:!ok,unknown:false,seen:true,day:new Date().toDateString(),last:Date.now()});
+  if(!ok)r.wrongCount=(r.wrongCount||0)+1; putRec(q,r); applyRecord(q); stats();
+}
+function unknown(q){
+  let r=rec(q);
+  if(retry&&retry.active){
+    retry.answers[q.id]={choice:"不知道",correct:false,wrong:false,unknown:true,ts:Date.now()};
+    r.retryTotal=(r.retryTotal||0)+1;
+    r.retryCorrect=r.retryCorrect||0;
+    r.retryWrong=r.retryWrong||0;
+    r.retryUnknown=(r.retryUnknown||0)+1;
+    r.lastRetry=Date.now();
+    putRec(q,r); applyRecord(q); updateRetryStats(); return;
+  }
+  Object.assign(r,{choice:"不知道",correct:false,wrong:false,unknown:true,seen:true,day:new Date().toDateString(),last:Date.now()});putRec(q,r);applyRecord(q);stats();
+}
+function applyRecord(q){
+  const r=rec(q);
+  const buttons=document.querySelectorAll(`#card_${q._i} [data-act="answer"]`);
+  buttons.forEach(b=>b.classList.remove("correct","wrong","unknown"));
+  const div=$("res_"+q._i); if(div){div.className="result"; div.innerHTML="";}
+  if(retry&&retry.active){
+    const a=retry.answers[q.id];
+    if(!a)return;
+    buttons.forEach(b=>{
+      if(b.dataset.k===q.answer&&q.answer)b.classList.add("correct");
+      if(a.wrong&&b.dataset.k===a.choice)b.classList.add("wrong");
+    });
+    showRetry(q,a); return;
+  }
+  buttons.forEach(b=>{ if((r.seen||r.choice)&&q.answer&&b.dataset.k===q.answer&&!mock?.submitted)b.classList.add("correct"); if(r.wrong&&b.dataset.k===r.choice)b.classList.add("wrong"); if(mock&&!mock.submitted&&r.mockChoice&&b.dataset.k===r.mockChoice)b.classList.add("unknown");});
+  if((r.seen||r.choice) && (!mock || mock.submitted)) show(q,r);
+}
+function showRetry(q,a){
+  const div=$("res_"+q._i); if(!div)return;
+  const cls=a.unknown?"unknown":(a.correct?"good":"bad");
+  div.className="result "+cls;
+  const chosen=a.unknown?"你選：不知道，直接看答案":`你選：${esc(a.choice)} ${esc(optionText(q,a.choice))}`;
+  div.innerHTML=`<b>本次重練：${a.unknown?"不知道":(a.correct?"答對":"答錯")}</b><br>${chosen}<br>正解：${esc(q.answer||"未標示")} ${esc(optionText(q,q.answer))}<div class="explain"><b>考前詳解</b><br>${esc(q.explanation||"待確認")}</div>`;
+}
+function startRetry(){
+  const arr=filtered(true);
+  if(!arr.length){alert("目前篩選沒有題目可以重練");return;}
+  retry={active:true,ids:arr.map(q=>q.id),answers:{},started:Date.now()};
+  mock=null; $("submitMock").style.display="none"; if(timerInt)clearInterval(timerInt);
+  page=1; render(); scrollTo(0,0);
+}
+function endRetry(){
+  retry=null; render(); scrollTo(0,0);
+}
+function updateRetryStats(){
+  const el=$("retryStats"); if(!el)return;
+  if(!(retry&&retry.active)){el.textContent="尚未開始重練";return;}
+  const vals=Object.values(retry.answers||{});
+  const answered=vals.length, right=vals.filter(x=>x.correct).length, wrong=vals.filter(x=>x.wrong).length, unk=vals.filter(x=>x.unknown).length;
+  const rate=(right+wrong)?Math.round(right/(right+wrong)*100)+"%":"0%";
+  el.innerHTML=`本次重練：${answered}/${retry.ids.length} 題<br>答對：${right}｜答錯：${wrong}｜不知道：${unk}<br>本次正確率：${rate}`;
+}
+function show(q,r){
+  const div=$("res_"+q._i); if(!div)return;
+  const cls=r.unknown?"unknown":(r.correct?"good":"bad");
+  div.className="result "+cls;
+  const chosen=r.unknown?"你選：不知道，直接看答案":`你選：${esc(r.choice)} ${esc(optionText(q,r.choice))}`;
+  div.innerHTML=`<b>${r.unknown?"不知道":(r.correct?"答對":"答錯")}</b><br>${chosen}<br>正解：${esc(q.answer||"未標示")} ${esc(optionText(q,q.answer))}<div class="explain"><b>考前詳解</b><br>${esc(q.explanation||"待確認")}</div>`;
+}
+function toggleNote(q){let r=rec(q);r.showNote=!r.showNote;putRec(q,r);render()}
+function setFlag(q,v){let r=rec(q);r.flag=r.flag===v?"":v;putRec(q,r);render()}
+function setConfidence(q,v){let r=rec(q);r.confidence=r.confidence===v?"":v;putRec(q,r);render()}
+function setMistake(q,v){let r=rec(q);r.mistake=r.mistake===v?"":v;putRec(q,r);render()}
+function startMock(){const n=Math.max(5,Number($("mockCount").value||40));mock={questions:[...filtered()].sort(()=>Math.random()-.5).slice(0,n),submitted:false};mockStart=Date.now();$("submitMock").style.display="inline-block";timerInt&&clearInterval(timerInt);timerInt=setInterval(()=>{$("timer").textContent="模擬考計時："+Math.floor((Date.now()-mockStart)/1000)+" 秒"},1000);page=1;render()}
+function submitMock(){if(!mock)return;mock.submitted=true;timerInt&&clearInterval(timerInt);let right=0;mock.questions.forEach(q=>{let r=rec(q); if(r.mockChoice){let ok=r.mockChoice===q.answer;Object.assign(r,{choice:r.mockChoice,correct:ok,wrong:!ok,unknown:false,seen:true,day:new Date().toDateString(),last:Date.now()});if(!ok)r.wrongCount=(r.wrongCount||0)+1; if(ok)right++; putRec(q,r)}});alert(`交卷完成：${right}/${mock.questions.length}，正確率 ${Math.round(right/mock.questions.length*100)}%`);$("submitMock").style.display="none";render()}
+function exportWeak(){let rows=QS.filter(q=>{let r=rec(q);return r.wrong||r.unknown||["必背","考前再看","有點卡"].includes(r.flag)||(r.wrongCount||0)>=2}).map(q=>{let r=rec(q);return `【${q.source} 第${q.number}題｜${q.topic}｜${(q.course_tags||[]).join("／")}】\n${q.stem}\n正解：${q.answer} ${optionText(q,q.answer)}\n詳解：${q.explanation}\n我的筆記：${r.note||""}\n標籤：${[r.flag,r.confidence,r.mistake].filter(Boolean).join("、")}\n重練紀錄：${r.retryTotal?`重練${r.retryTotal}次，對${r.retryCorrect||0}，錯${r.retryWrong||0}，不知道${r.retryUnknown||0}`:"無"}\n`}).join("\n---\n");download("呼吸題庫_未掌握小抄.txt",rows||"目前沒有未掌握題")}
+function download(name,text){let a=document.createElement("a");a.href=URL.createObjectURL(new Blob([text],{type:"text/plain;charset=utf-8"}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+function openSettings(){["title","subtitle","exam","goal","accent","bg","card","ink","good","bad","font","width","density","bgOpacity"].forEach(k=>{let el=$("set_"+(k==="bgOpacity"?"bg_opacity":k)); if(el)el.value=settings[k]??""});$("set_avatar_url").value=settings.avatarUrl||"";$("set_hero_url").value=settings.heroUrl||"";$("set_bg_url").value=settings.bgUrl||"";$("settingsModal").classList.add("show")}
+function saveSettingsFromForm(){Object.assign(settings,{title:$("set_title").value,subtitle:$("set_subtitle").value,exam:$("set_exam").value,goal:Number($("set_goal").value||80),accent:$("set_accent").value,bg:$("set_bg").value,card:$("set_card").value,ink:$("set_ink").value,good:$("set_good").value,bad:$("set_bad").value,font:Number($("set_font").value||16),width:Number($("set_width").value||920),density:$("set_density").value,bgOpacity:Number($("set_bg_opacity").value||.18),avatarUrl:$("set_avatar_url").value,heroUrl:$("set_hero_url").value,bgUrl:$("set_bg_url").value});save(SET_KEY,settings);applySettings();$("settingsModal").classList.remove("show")}
+function applyPreset(p){const presets={light:{bg:"#f7f8fb",card:"#ffffff",ink:"#172033",accent:"#2563eb"},dark:{bg:"#111827",card:"#1f2937",ink:"#f9fafb",accent:"#60a5fa"},cream:{bg:"#fbf7ef",card:"#fffdf7",ink:"#1f2933",accent:"#2f855a"},pink:{bg:"#fff1f2",card:"#ffffff",ink:"#3f2332",accent:"#db2777"},mono:{bg:"#f5f5f5",card:"#ffffff",ink:"#111111",accent:"#111111"}}; if(presets[p]){Object.assign(settings,presets[p]);save(SET_KEY,settings);applySettings();openSettings()}}
+function applySettings(){document.documentElement.style.setProperty("--accent",settings.accent||"#2563eb");document.documentElement.style.setProperty("--bg",settings.bg||"#f7f8fb");document.documentElement.style.setProperty("--card",settings.card||"#fff");document.documentElement.style.setProperty("--ink",settings.ink||"#172033");document.documentElement.style.setProperty("--good",settings.good||"#059669");document.documentElement.style.setProperty("--bad",settings.bad||"#dc2626");document.documentElement.style.setProperty("--fontSize",(settings.font||16)+"px");document.documentElement.style.setProperty("--cardMax",(settings.width||920)+"px");document.documentElement.style.setProperty("--bgOpacity",settings.bgOpacity??.18);document.body.classList.toggle("compact",settings.density==="compact");document.body.classList.toggle("dark",(settings.bg||"").toLowerCase()==="#111827");$("siteTitle").textContent=settings.title||"Mic 的呼吸區段考互動題庫";$("siteSubtitle").textContent=settings.subtitle||"";let bg=settings.bgData||settings.bgUrl;if(bg)document.documentElement.style.setProperty("--bgImage",`url("${bg}")`);["avatar","hero"].forEach(k=>{let img=$(k==="hero"?"heroImage":"avatar"),src=settings[k+"Data"]||settings[k+"Url"];if(src){img.src=src;img.style.display="block"}else img.style.display="none"});countdown();stats()}
+function countdown(){if(!settings.exam){$("countdown").textContent="尚未設定考試日";return}let d=new Date(settings.exam+"T00:00:00"),now=new Date();let days=Math.ceil((d-now)/(86400000));$("countdown").textContent=days>=0?`距離考試還有 ${days} 天`:`考試已過 ${Math.abs(days)} 天`}
+function readImage(file,id){if(!file)return;let r=new FileReader();r.onload=()=>{if(id==="upload_avatar")settings.avatarData=r.result;if(id==="upload_hero")settings.heroData=r.result;if(id==="upload_bg")settings.bgData=r.result;save(SET_KEY,settings);applySettings()};r.readAsDataURL(file)}
+function exportSettings(){download("resp_quiz_settings.json",JSON.stringify(settings,null,2))}
+function importSettings(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{settings=JSON.parse(r.result);save(SET_KEY,settings);applySettings();alert("設定已匯入")}catch(err){alert("匯入失敗")}};r.readAsText(f)}
+init();
+})();
+</script>
+</body>
+</html>
